@@ -11,6 +11,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import Contacts from 'react-native-contacts';
 import ContactPhone from   '../../Imagenes/phone.png'
 
+import * as permissions from 'react-native-permissions';
+// you may also import just the functions or constants that you will use from this library
+import {request, PERMISSIONS} from 'react-native-permissions';
+
 const windowWidth = Math.round(Dimensions.get('window').width);
 const windowHeight = Math.round(Dimensions.get('window').height);
 
@@ -64,17 +68,49 @@ class CitasParte1 extends Component {
     requestContactsPermission = async () => 
       {
         try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-            {
-              'title': 'Contactos',
-            'message': 'Esta aplicacion requiere los permisos a tus contactos para funcion correcta del modulo '
-            }
-          )
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          if (Platform.OS === 'ios') {
+            request(PERMISSIONS.IOS.CONTACTS).then((result) => {
+              if(result == 'granted'){
+              }
+              else{
+                
+              }
+            
+            });
 
-          } else {
           }
+          else
+          {
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+              {
+                'title': 'Contactos',
+              'message': 'Esta aplicacion requiere los permisos a tus contactos para funcion correcta del modulo '
+              }
+            )
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            
+            }
+            else{
+
+            }
+
+          }
+          request(Platform.OS === 'ios' ? PERMISSIONS.IOS.CONTACTS : PERMISSIONS.ANDROID.CONTACTS).then((result) => {
+            //setPermissionResult(result)
+            console.log(result)
+          });
+          //const granted = await PermissionsAndroid.request(
+          //  PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+          //  {
+          //    'title': 'Contactos',
+          //  'message': 'Esta aplicacion requiere los permisos a tus contactos para funcion correcta del modulo '
+          //  }
+          //)
+          //if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+
+          //} else {
+          //}
         } catch (err) {
           console.log(err)
         }
@@ -267,6 +303,33 @@ class CitasParte1 extends Component {
 
     ShowAllContacts = async ()=>{
       try {
+        if (Platform.OS === 'ios') {
+          request(PERMISSIONS.IOS.CONTACTS).then((result) => {
+            if(result == 'granted'){
+              Contacts.getAll()
+              .then((contacts) => {
+                let contactsWithNumber = contacts.filter(obj=> obj.phoneNumbers.length>0)
+                console.log(contactsWithNumber)
+                let ContactosPhone = contactsWithNumber.map((contact) => {
+                   return {
+                  Name: contact.givenName + ' ' + contact.familyName, 
+                  Number: contact.phoneNumbers[0].number
+                }  
+                } );
+                let NwContactosPhone = ContactosPhone.slice(0,5)
+                this.setState({ isModalContactos : true, LContactos: ContactosPhone, LContactosFilter: NwContactosPhone})
+              })
+              .catch((e) => {
+                console.log(e)
+              })
+              }
+              else{
+
+              }
+            });
+        }
+        else
+        {
           const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
             {
@@ -274,7 +337,7 @@ class CitasParte1 extends Component {
             'message': 'Esta aplicacion requiere los permisos a tus contactos para funcion correcta del modulo '
             }
           )
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           Contacts.getAll()
           .then((contacts) => {
             let contactsWithNumber = contacts.filter(obj=> obj.phoneNumbers.length>0)
@@ -286,12 +349,13 @@ class CitasParte1 extends Component {
             } );
             let NwContactosPhone = ContactosPhone.slice(0,5)
             this.setState({ isModalContactos : true, LContactos: ContactosPhone, LContactosFilter: NwContactosPhone})
-          })
-          .catch((e) => {
-            console.log(e)
-          })
-        } else {
-        }
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+          } else {
+          }
+        }  
       } catch (err) {
         console.log(err)
       }
