@@ -10,6 +10,7 @@ import {API_URL_GRAL} from '../../Constantes/constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Contacts from 'react-native-contacts';
 import ContactPhone from   '../../Imagenes/phone.png'
+import DatePicker from 'react-native-date-picker';
 
 import * as permissions from 'react-native-permissions';
 // you may also import just the functions or constants that you will use from this library
@@ -55,7 +56,7 @@ class CitasParte1 extends Component {
     async componentDidMount()
     {
       try {
-        this.requestContactsPermission();
+        //this.requestContactsPermission();
 
         
       } catch (error) {
@@ -407,12 +408,30 @@ class CitasParte1 extends Component {
                                 <Text style={{color:'black', textAlign:'center', textAlignVertical:'center', marginTop:10}}>{this.state.date}</Text>
                             </View>
                             {this.state.datePickerShow && (
-                            <DateTimePicker
-                                    testID="dateTimePicker"
-                                    value={this.state.dateAll}
-                                    mode={'date'}
-                                    onChange={this.onDateSelectedAndroid}
-                                  />
+                                Platform.OS === 'ios' ?
+                                <DatePicker
+                                modal
+                                open={this.state.datePickerShow}
+                                date={this.state.dateAll}
+                                onConfirm={(date) => {
+                                    this.onDateSelectedIOS(date)
+                                }}
+                                onCancel={() => {
+                                this.setState({datePickerShow: false})
+                                }}
+                                mode={'date'}
+                                confirmText={'Confirmar'}
+                                cancelText={'Cancelar'}
+                                />
+                                :  
+                                <DateTimePicker
+                                testID="dateTimePicker"
+                                value={this.state.dateAll}
+                                mode={'date'}
+                                style={styles.datePicker}
+                                onChange={this.onDateSelectedAndroid}
+                                
+                                />
                             )}
                         </View>
                         </TouchableOpacity>
@@ -428,15 +447,32 @@ class CitasParte1 extends Component {
                                     <Text style={{color:'black', textAlign:'center', textAlignVertical:'center', marginTop:10}}>{this.state.time}</Text>
                                 </View>
                                 {this.state.datePickerTimeShow && (
-                              <DateTimePicker
-                                      testID="dateTimePicker"
-                                      value={this.state.dateAllTime}
-                                      mode={'time'}
-                                      style={styles.datePicker}
-                                      is24Hour={true}
-                                      onChange={this.onDateTimeSelectedAndroid}
-                                      />
-                              )}
+                                    Platform.OS === 'ios' ?
+                                    <DatePicker
+                                    modal
+                                    open={this.state.datePickerTimeShow}
+                                    date={this.state.dateAllTime}
+                                    onConfirm={(date) => {
+                                        this.onDateTimeSelectedIOS(date)
+                                    }}
+                                    onCancel={() => {
+                                    this.setState({datePickerTimeShow: false})
+                                    }}
+                                    mode={'time'}
+                                    confirmText={'Confirmar'}
+                                    cancelText={'Cancelar'}
+                                    />
+                                    :
+                                    <DateTimePicker
+                                    testID="dateTimePickerTime"
+                                    value={this.state.dateAllTime}
+                                    mode={'time'}
+                                    style={styles.datePicker}
+                                    onChange={this.onDateTimeSelectedAndroid}
+                                    
+                                    />
+                                )
+                                }
                             </View>
                             </TouchableOpacity>
                         </View>
