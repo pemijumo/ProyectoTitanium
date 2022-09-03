@@ -335,7 +335,7 @@ class CitasParte1 extends Component {
             PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
             {
               'title': 'Contactos',
-            'message': 'Esta aplicacion requiere los permisos a tus contactos para funcion correcta del modulo '
+            'message': 'Se requiere del permiso a los contactos del teléfono para esta funcionalidad de seleccion de números existentes, de no otorgar el permiso deberá escribir el número telefonico manualmente. ¿Desea permitir? '
             }
           )
           if (granted === PermissionsAndroid.RESULTS.GRANTED) {

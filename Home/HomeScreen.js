@@ -205,12 +205,14 @@ const Page6_StackNavigator = ({ navigation }) =>
 const DrawerNavigator = () =>
 {
   return (
+    
     <Drawer.Navigator
     screenOptions ={{ activeTintColor: '#e91e63', itemStyle: {marginVertical: 5}  }}
     
     drawerContent={(props) => <CustomSidebarMenu {...props} />}
-    >
 
+    //initialRouteName = {(props) => props.route[0]._NameMenuActivo}
+    >
         <Drawer.Screen name="Screen1" component={Home_StackNavigator} options={{ header: () => null}} />
         <Drawer.Screen name="Screen2" component={Page2_StackNavigator} options={{ header: () => null}} />
         <Drawer.Screen name="Screen3" component={Page3_StackNavigator} options={{ header: () => null}} />
@@ -219,6 +221,7 @@ const DrawerNavigator = () =>
         <Drawer.Screen name="Screen6" component={Page6_StackNavigator} options={{ header: () => null}} />
 
     </Drawer.Navigator>
+  
   );
 }
 export default (DrawerNavigator)

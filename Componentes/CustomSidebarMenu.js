@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { View, StyleSheet, Image, Text, ImageBackground, TouchableOpacity, SafeAreaView } from 'react-native';
-import { IconButton } from 'react-native-paper';
+import { IconButton, Menu } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 // import { connect } from 'react-redux'
 //import {SafeAreaView} from 'react-navigation'
-import { API_URL } from '../Constantes/constants';
-import DrawerNavigator from '../Home/HomeScreen';
+import { API_URL_GRAL } from '../Constantes/constants';
 
 let _NomUsuario = ''
+let _Mail = ''
+let _Tel = ''
+let _Menu = []
+let _CodeMenuActivo = 0
+let _NameMenuActivo = ''
 class CustomSidebarMenu extends Component { 
   constructor(props) {
     super(props);
@@ -18,71 +21,78 @@ class CustomSidebarMenu extends Component {
       ,FotoUser: ''
       ,NombreUser: ''
     }
-
     this.proileImage =
       'https://aboutreact.com/wp-content/uploads/2018/07/sample_img.png';
-    this.items = this.RevisionRol();
-
   }
 
-  RevisionRol () 
-  {
-    let menu = []
-    let menuList = [];
-    let valorobj = { navOptionThumb: "home", navOptionName: "Inicio", screenToNavigate: "Screen1" }
-    menuList.push(valorobj)
-    let valorobj1 = { navOptionThumb: "book-clock", navOptionName: "Invitaciones / citas", screenToNavigate: "Screen2" }
-    menuList.push(valorobj1)
-    let valorobj2 = { navOptionThumb: "qrcode-scan", navOptionName: "Lector QR", screenToNavigate: "Screen3" }
-    menuList.push(valorobj2)
-    let valorobj3 = { navOptionThumb: "web", navOptionName: "Sitio corporativo", screenToNavigate: "Screen4" }
-    menuList.push(valorobj3)
-    let valorobj4 = { navOptionThumb: "semantic-web", navOptionName: "Reserva tu espacio", screenToNavigate: "Screen5" }
-    menuList.push(valorobj4)
-    let valorobj5 = { navOptionThumb: "account-cog", navOptionName: "Cambiar contraseña", screenToNavigate: "Screen6" }
-    menuList.push(valorobj5)
-
-    
-    console.log(_NomUsuario)
-    // let url_ = `${API_URL}ConsultaModulos?Opcion=1`
-    //   + '&UserId=' + this.props.user.Id_Usuario
-    //   + '&RolUser=' + this.props.user.Rol      
-    //   fetch(url_)
-    //   .then(res => res.json())
-    //   .then(res => {
-    //       menu = res;
-    //       try {
-    //         for(let i = 0; i < menu.length; i++){
-    //           let valorobj = { navOptionThumb: menu[i].Icono, navOptionName: menu[i].Nombre, screenToNavigate: menu[i].Pantalla }
-    //           menuList.push(valorobj)
-    //         }  
-    //       } catch (error) {
-    //         return []
-    //       }
-    //     })
-       return menuList;  
-  }
-  componentDidMount()
+  async componentDidMount()
   {
     global.currentScreenIndex = 0;
-    //this.ConsultarImgUser()
+    await this.ObtenerDatos();
+    _Menu = await this.ObtenerMenuRol();
+    await this.RedireccionaMenu();
+    //console.log(_Menu)
+    //this.props.navigation.navigate(_Menu[0].MenuActivo);
     //console.log(this.props)
-    this.ObtenerNombre();
   }
 
-  ObtenerNombre = async ()=>{
+  ObtenerDatos = async ()=>{
     _NomUsuario = await AsyncStorage.getItem('@NombreUser')
+    _Mail = await AsyncStorage.getItem('@CorreoUser')
+    _Tel = await AsyncStorage.getItem('@TelefonoUser')
   }
+
+  ObtenerMenuRol= async ()=>{
+    let menuList = [];
+    let url_ = `${API_URL_GRAL}ConsultaModulos?`
+      + 'Usuario=' + _Mail
+      + '&PhoneNumber=' + _Tel      
+
+      fetch(url_)
+      .then(res => res.json())
+      .then(res => {
+          menu = res;
+          //console.log(menu)
+          try {
+            if(menu.length>0){
+              for(let i = 0; i < menu.length; i++){
+                let valorobj = { Code: menu[i].Code, navOptionThumb: menu[i].Icono, navOptionName: menu[i].Nombre, screenToNavigate: menu[i].Pantalla, MenuActivo: menu[i].NameActivo }
+                //console.log(menu[i])
+                _CodeMenuActivo = menu[i].CodeActivo;
+                _NameMenuActivo = menu[i].NameActivo;
+
+                //console.log(_NameMenuActivo)
+                menuList.push(valorobj)
+                //console.log(menuList)
+              }  
+              if(_NameMenuActivo!=''){
+                this.props.navigation.navigate(_NameMenuActivo);
+              }
+            }
+            else
+            {
+
+            }
+          } catch (error) {
+            return []
+          }
+        })
+        //console.log(menuList)
+       return menuList;  
+  }
+
   componentDidUpdate()
   {
 
   }
   ConsultarImgUser = () =>{
     
-}
+  }
+
+  
+  
 
   render() {
-    //let NombreUser = AsyncStorage.getItem('@NombreUser')
     return (
         <SafeAreaView>
         <View style={{flexDirection:'row'}}>
@@ -104,16 +114,17 @@ class CustomSidebarMenu extends Component {
         </View>
         
         
-        {this.items.map((item, key) => (
+        {_Menu.map((item, key) => (
               <TouchableOpacity
                 key={key}
                 onPress={()=> {
-                  this.setState({FilaActiva:key})
+                  _CodeMenuActivo = item.Code
+                  //this.setState({FilaActiva: item.Code/*key*/})
                   this.props.navigation.navigate(item.screenToNavigate);
                 }
                 }
                 style={{ height: 40, marginTop: 3 
-                ,backgroundColor: this.state.FilaActiva == key ? '#e0dbdb' : '#ffffff'
+                ,backgroundColor: _CodeMenuActivo == item.Code ? '#e0dbdb' : '#ffffff'
                  ,alignItems:'flex-start'
                  , paddingLeft: 15
                  , paddingTop: 10
@@ -125,7 +136,7 @@ class CustomSidebarMenu extends Component {
                 <Text
                   style={{
                     fontSize: 15,
-                    color: this.state.FilaActiva == key ? 'red' : 'black',
+                    color: _CodeMenuActivo == item.Code ? 'red' : 'black',
                     paddingLeft:10
                   }}
                   >
