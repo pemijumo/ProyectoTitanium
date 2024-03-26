@@ -37,7 +37,7 @@ class CitasParte1 extends Component {
           time: '00:00:00',
           vlTipoPersonal:'',
           vlTextTipoPersonal:'',
-          ListTipoPersonal : [{key:'1', label:'Invitado'}, {key:'2', label:'Proveedor'}],
+          ListTipoPersonal : [{key:'1', label:'Invitado'}/*, {key:'2', label:'Proveedor'}*/],
           vlTxtMotivoVisita: '',
           vltxtTelefonoVisitante:'',
           vlTipoAcceso:'',
