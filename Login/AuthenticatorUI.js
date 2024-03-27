@@ -154,6 +154,13 @@ export default class AuthenticatorUI extends Component {
                     </View>
                     <View style={{flexDirection:'column', flex:1}}></View>
                 </View>
+                <View style={{flexDirection:'row', height:5, paddingTop:10, margin:0}}>
+                    <View style={{flexDirection:'column', flex:1}}></View>
+                    <View style={{flexDirection:'column', flex:10}}>
+                            <Text style={{textAlign:'center', color:'black'}}>Consulta</Text>
+                    </View>
+                    <View style={{flexDirection:'column', flex:1}}></View>
+                </View>
 
                             <View style={{
                                 flexDirection: 'row',
