@@ -3,4 +3,4 @@
 const HOST = '74.208.124.142:50/TNC'
 
 export const API_URL_GRAL = `http://${HOST}/`;
-export const VersionSys = 'v2.1.5 Mazapán' //Muégano';
+export const VersionSys = 'v2.1.6 Mazapán' //Muégano';
