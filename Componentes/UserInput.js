@@ -2,7 +2,8 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import { Image, StyleSheet, View, Dimensions } from 'react-native';
 import { TextInput } from 'react-native-paper';
-
+import Icon2 from 'react-native-vector-icons/Entypo'
+import colors from '../resources/styles/colors'
 class UserInput extends Component {
   constructor(props) {
     super(props);
@@ -11,12 +12,13 @@ class UserInput extends Component {
   render(){
   return(
         <View style={styles.inputWrapper}>
-        <Image source={this.props.source} style={styles.inlineImg} />
+        {/* <Image source={this.props.source} style={styles.inlineImg} /> */}
+        {/* <Icon2 name={this.props.source} color={"white"} size={25} style={styles.inlineImg} /> */}
             <TextInput
                 style={[styles.input, {height:this.props.heightInput }]}
                 underlineColorAndroid='rgba(0,0,0,0)' 
                 placeholder={this.props.placeholder}
-                placeholderTextColor='#ffffff'
+                placeholderTextColor='gray'
                 textContentType='emailAddress'
                 secureTextEntry={this.props.secureTextEntry}
                 autoCorrect={this.props.autoCorrect}
@@ -26,7 +28,7 @@ class UserInput extends Component {
                 //placeholderTextColor="white"
                 //underlineColorAndroid="transparent"
                 theme={{ colors: { 
-                placeholder: 'black', text: 'white', primary: 'orange',
+                placeholder: 'black', text: 'white', primary: 'white',
                 background : '#ED9A0C',
             }}}
             />
@@ -59,14 +61,14 @@ const styles = StyleSheet.create({
       //height: props.heightInput,
       //marginHorizontal: 20,
       paddingLeft: 70,
-      borderRadius: 10,
+      //borderRadius: 10,
       //color: '#ffffff',
       
       
     },
     inputWrapper: {
       flex:1,
-      paddingTop:20,
+      //paddingTop:20,
     },
     inlineImg: {
       position: 'absolute',

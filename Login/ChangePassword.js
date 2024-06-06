@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableHighlight, Alert, ActivityIndicator } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, TouchableHighlight, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
+// import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Button, TextInput } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {API_URL_GRAL} from '../Constantes/constants'

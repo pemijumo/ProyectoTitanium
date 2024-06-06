@@ -68,6 +68,8 @@ const App: () => Node = () => {
   };
 
   return (
+    // <PushyHorizontalMenu/>
+
     <SafeAreaView style={backgroundStyle}>
       <View style={{flex: 1 }}>
         <NavigationContainer>
@@ -75,6 +77,15 @@ const App: () => Node = () => {
         </NavigationContainer>
       </View>
     </SafeAreaView>
+    
+    //   <SafeAreaView style={backgroundStyle}>
+    //   <View style={{flex: 1 }}>
+    //     <NavigationContainer>
+    //     <PushyHorizontalMenu/>
+    //     </NavigationContainer>
+    //   </View>
+    // </SafeAreaView>
+    
   );
 };
 

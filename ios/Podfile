@@ -32,6 +32,8 @@ target 'titaniumcn' do
 
   pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
 
+  pod 'Interactable', :path => '../node_modules/react-native-interactable'
+
   target 'titaniumcnTests' do
     inherit! :complete
     # Pods for testing

@@ -11,6 +11,9 @@ import logoTitaniumImg from   '../Imagenes/LogoTitanium.jpg'
 import { Button, IconButton } from 'react-native-paper';
 import {SIZES, InputLogin, ModeDark, ModeLight} from '../Constantes/Tema'
 import { VersionSys } from '../Constantes/constants';
+import Icon2 from 'react-native-vector-icons/Entypo'
+import Icon3 from 'react-native-vector-icons/MaterialIcons'
+import colors from '../resources/styles/colors';
 
 //const isDarkMode = useColorScheme() === 'dark';
 
@@ -21,6 +24,8 @@ export default class AuthenticatorUI extends Component {
     this.state = {
       showPass: true,
       press: false,
+      iconPass : 'eye',
+      //iconNotShow : 'eye-with-line'
     };
     this.showPass = this.showPass.bind(this);
   }
@@ -31,8 +36,8 @@ export default class AuthenticatorUI extends Component {
 
   showPass() {
     this.state.press === false
-      ? this.setState({showPass: false, press: true})
-      : this.setState({showPass: true, press: false});
+      ? this.setState({showPass: false, press: true, iconPass: 'eye-with-line'})
+      : this.setState({showPass: true, press: false, iconPass: 'eye'});
   }
 
   render() {
@@ -44,7 +49,7 @@ export default class AuthenticatorUI extends Component {
       textStyle = {{color: '#FFF'}}
       /> */}
       <ScrollView keyboardShouldPersistTaps='handled'>
-      <View style={{flexDirection:'row', paddingTop: SIZES.height * SIZES.TopGeneral }}></View>
+      <View style={{flexDirection:'row', paddingTop: SIZES.height * SIZES.TopGeneral, backgroundColor:colors.bdMain }}></View>
         <View style={{flexDirection:'row'}}>
           <View style={{flex: 2, flexDirection:'row'}}></View>
           <View style={{flex: 8, flexDirection:'row'}}>
@@ -78,13 +83,31 @@ export default class AuthenticatorUI extends Component {
                 <View style={{flex: 3, flexDirection:'row'}}></View>
               </View> */}
         <View style={{flexDirection:'row'}}>
-          <View style={{flex: 1, flexDirection:'row'}}></View>
+          <View style={{flex: 1, flexDirection:'row'}}>
           
-          <View style={{flex: 10, flexDirection:'row', paddingLeft:20, paddingRight:20 }}>
+
+          </View>
+          
+          <View style={{flex: 8, flexDirection:'row', paddingLeft:0, paddingRight:0 }}>
             <View style={{flexDirection:'column', width:'100%'}}>
+              
             <KeyboardAvoidingView behavior="padding" >
+            <View style={{
+                                flexDirection: 'row', paddingTop:20
+                            }}>
+            
+            <TouchableOpacity
+                
+                >
+                  {/* <IconButton icon="eye" color="white" size={30}></IconButton> */}
+                  <Icon2 name={'user'} color={colors.colorTCN} size={30} />
+                </TouchableOpacity>
+                <Text style={{color:'black'}}>Usuario:</Text>
+                </View>
+
+              <View style={{ flexDirection: 'row', paddingTop:2 }}></View>
               <UserInput 
-              source={usernameImg}
+              source={'user'}
               placeholder="Usuario"
               autoCapitalize={'none'}
               returnKeyType={'done'}
@@ -93,8 +116,25 @@ export default class AuthenticatorUI extends Component {
               heightInput={InputLogin.height}
               />
 
+
+
+              <View style={{ flexDirection: 'row', paddingTop:20 }}></View>
+              <View style={{
+                                flexDirection: 'row', padding:1,
+                            }}>
+            
+            <TouchableOpacity
+                
+                >
+                  {/* <IconButton icon="eye" color="white" size={30}></IconButton> */}
+                  <Icon2 name={'key'} color={colors.colorTCN} size={30} />
+                </TouchableOpacity>
+                <Text style={{color:'black'}}>Contraseña:</Text>
+                </View>
+                
+
               <UserInput
-              source={passwordImg}
+              source={'key'}
               secureTextEntry={this.state.showPass}
               placeholder="Contraseña"
               returnKeyType={'done'}
@@ -110,7 +150,8 @@ export default class AuthenticatorUI extends Component {
                 onPress={this.showPass }
                 onBlur={false}
               >
-                <IconButton icon="eye" color="white" size={30}></IconButton>
+                {/* <IconButton icon="eye" color="white" size={30}></IconButton> */}
+                <Icon2 name={this.state.iconPass} color={"white"} size={30} />
               </TouchableOpacity>
 
               <View style={{
@@ -121,7 +162,7 @@ export default class AuthenticatorUI extends Component {
                                     <Button 
                                     tyle={styles.button}
                                     mode="contained" color="#f4cc37"
-                                    onPress={()=> this.props.mainAction()}>Ingresar</Button>
+                                    onPress={()=> this.props.mainAction()}>Entrar</Button>
                                 </TouchableHighlight>
                             </View>
 
@@ -205,7 +246,7 @@ const styles = StyleSheet.create({
     },
     btnEye: {
       position:'absolute',
-      top: 80,
+      top: 160,
       right: 10,
     },
     iconEye: {
