@@ -231,10 +231,14 @@ android {
             keyPassword 'android'
         }
         release {
-                storeFile file('my-titaniumallaccess-key.keystore')
-                storePassword 'titaniumcn2022'
-                keyAlias 'my-key-titaniumallaccess'
-                keyPassword 'titaniumcn2022'
+                // storeFile file('my-titaniumallaccess-key.keystore')
+                // storePassword 'titaniumcn2022'
+                // keyAlias 'my-key-titaniumallaccess'
+                // keyPassword 'titaniumcn2022'
+                 storeFile file('titaniumallaccess-key.keystore')
+                storePassword 'titaniumcn2024'
+                keyAlias 'key-titaniumallaccess'
+                keyPassword 'titaniumcn2024'
         }
     }
     buildTypes {

@@ -12,8 +12,9 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+import { API_URL_GRAL as API_URL_TCN } from  '../Constantes/constants';
 
-const API_URL_TCN = 'http://187.190.62.113/TCN_WEB/TNC/'
+//const API_URL_TCN = 'http://187.190.62.113/TCN_WEB/TNC/'
 const API_URL = 'https://spatiatek-access-demo-php.herokuapp.com/api/access/'
 
 
