@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableHighlight, Alert, ActivityIndicator } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, TouchableHighlight, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
+// import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Button, TextInput } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {API_URL_GRAL} from '../Constantes/constants'
@@ -220,10 +220,10 @@ class ChangePassword extends Component {
                 <View style={{flexDirection:'row', height:45, margin:0}}>
                     <View style={{flexDirection:'column', flex:4}}></View>
                     <View style={{flexDirection:'column', flex:4}}>
-                        <TouchableOpacity>
-                            <Button mode="contained" color="#f4cc37"
-                            onPress={this.ChangePaswordNw}
-                            >Actualizar</Button>
+                        <TouchableOpacity
+                        onPress={this.ChangePaswordNw}
+                        >
+                            <Button mode="contained" color="#f4cc37">Actualizar</Button>
                         </TouchableOpacity>
                     </View>
                     <View style={{flexDirection:'column', flex:4}}></View>

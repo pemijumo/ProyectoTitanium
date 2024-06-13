@@ -3,11 +3,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import LoginScreen  from './LoginScreen';
 import AuthLoading  from './AuthLoading';
-//import Home  from '../Home/Home'
+import Home  from '../Home/Home'
 import HomeScreen from '../Home/HomeScreen'
 import vAvisoPrivacidad from './AvisoPrivacidad'
 import vListaCitas from  '../Screens/Citas/ListaCitasGeneradas'
-
+import PushyHorizontalMenu from '../screens2/drawers/PushyHorizontalMenu'
 const Stack = createNativeStackNavigator();
 
 function Navigator()
@@ -22,7 +22,7 @@ function Navigator()
                 <Stack.Screen name="Login" component={LoginScreen} 
                  options={{header: () => null}}
                 />
-                <Stack.Screen name="App" component={HomeScreen} 
+                <Stack.Screen name="App" component={PushyHorizontalMenu} 
                  options={{header: () => null}} 
                 />
                 <Stack.Screen name="AuthLoading" component={AuthLoading}

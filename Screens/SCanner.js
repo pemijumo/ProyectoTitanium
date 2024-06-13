@@ -147,7 +147,7 @@ class SCanner extends Component {
 
   ValidaAcceso = async (_Inmueble, _Tipo, _NumAccess)=>{
     try {
-      console.log('entra a validar acceso')
+      console.log('entra a validar acceso: ' + '_Inmueble: ' + _Inmueble + '_Tipo: ' + _Tipo + '_NumAccess: ' + _NumAccess )
       const _vlTelefono = await AsyncStorage.getItem('@TelefonoUser')
       const _Modo = this.state.ModoValidacion == 'residente' ? 3 : 4
         const response = await fetch(`${API_URL_TCN}ValidarAccesoUsuario`, {
@@ -167,6 +167,8 @@ class SCanner extends Component {
           })
           .then((response) => response.json()
           .then((resp) => {
+            console.log('entra a validar acceso: ' + 'TipoAcceso: ' + 2 + ' Modo: ' + _Modo + ' Usuario: ' + _vlTelefono + ' _Inmueble: ' + _Inmueble + ' _Tipo: ' + _Tipo + ' _NumAccess: ' + _NumAccess )
+            console.log('valor devuelto desde ValidarAccesoUsuario:')
             console.log(resp)
             let TipoRespuesta = resp[0].TipoMensaje
             let Mensaje = resp[0].Message
@@ -212,6 +214,15 @@ class SCanner extends Component {
       {
           this.AperturaOnlyMecanismo(_Modo, _vlTelefono, _Inmueble, _Tipo, _NumAccess, _Nodo, _Rele);
       }
+      else if(resp.msg == 'OFFLINE')
+      {
+          this.setState({loading: false});
+          Alert.alert(
+            'Titanium All Access', '¡Intenta nuevamente!',
+            [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
+            {cancelable: false},
+          );
+      }
       else{
         this.setState({loading: false});
         Alert.alert(
@@ -242,6 +253,7 @@ class SCanner extends Component {
           })
           .then((response) => response.json()
           .then((resp) => {
+            console.log('Valor devuelto de la apertura:')
             console.log(resp.msg)
             if(resp.msg == 'Registro generado')
             {

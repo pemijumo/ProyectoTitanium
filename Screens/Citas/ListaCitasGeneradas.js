@@ -152,6 +152,8 @@ class ListaCitasGeneradas extends Component {
                             this.setState({datePickerShow1: false})
                             }}
                             mode={'date'}
+                            confirmText={'Confirmar'}
+                            cancelText={'Cancelar'}
                             />
                             :  
                             <DateTimePicker
@@ -187,6 +189,8 @@ class ListaCitasGeneradas extends Component {
                             this.setState({datePickerShow2: false})
                             }}
                             mode={'date'}
+                            confirmText={'Confirmar'}
+                            cancelText={'Cancelar'}
                             />
                             : 
                             <DateTimePicker

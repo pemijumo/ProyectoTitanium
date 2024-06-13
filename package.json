@@ -25,6 +25,7 @@
     "react-native-date-picker": "^4.2.2",
     "react-native-elements": "^3.4.2",
     "react-native-gesture-handler": "^2.4.2",
+    "react-native-interactable": "^2.0.1",
     "react-native-modal-selector": "^2.1.0",
     "react-native-paper": "^4.12.1",
     "react-native-permissions": "^3.3.1",
