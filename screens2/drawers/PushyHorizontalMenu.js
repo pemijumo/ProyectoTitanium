@@ -1,5 +1,5 @@
 import React, { Component, useRef } from 'react'
-import { StyleSheet, View, TouchableOpacity, Image, Text, Button, Dimensions, Animated, ScrollView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Text, Button, Dimensions, Animated, ScrollView, BackHandler, Alert } from 'react-native'
 import Interactable from 'react-native-interactable'
 import Icon                     from 'react-native-vector-icons/FontAwesome'
 import Menu                     from './../../components/Menu'
@@ -10,6 +10,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import NavMenu from '../NavMenu'
 import DemoScreen from '../DemoScreen'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const Screen = Dimensions.get('window')
 const SideMenuWidth = 300
 const SideMenuHeight = 10
@@ -32,6 +34,49 @@ export default class SideMenu extends Component {
         this.deltaX = new Animated.Value(0)
         this.deltaY = new Animated.Value(0)
     }
+
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        if (this.state.menuOpened) {
+            this.onMenuPress();
+            return true; // Prevenir el comportamiento por defecto (salir de la app)
+        } else {
+            Alert.alert(
+                'Titanium CN',
+                '¿Estás seguro que quieres salir de la aplicación?',
+                [
+                    {
+                        text: 'Cancelar',
+                        onPress: () => null,
+                        style: 'cancel'
+                    },
+                    {
+                        text: 'Sí',
+                        onPress: ()=>{ 
+                            // AsyncStorage.removeItem('@IDUser')    
+                            // AsyncStorage.removeItem('@NombreUser')
+                            // AsyncStorage.removeItem('@CorreoUser') 
+                            // AsyncStorage.removeItem('@TelefonoUser')                       
+                            // AsyncStorage.removeItem('@PDUser')
+                            // AsyncStorage.removeItem('@TypUser')  
+                            //navigation.dispatch(StackActions.replace('Login')); 
+                            BackHandler.exitApp() 
+                        } 
+                    }
+                ],
+                { cancelable: false }
+            );
+            return true;
+        }
+    }
+
     render() {
         return (
             

@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 // import auth from '@react-native-firebase/auth';
 // import { connect } from 'react-redux'
 // import * as userActions from '../reduxStore/actions/user'
-import {API_URL_GRAL} from '../Constantes/constants'
+import {API_URL_GRAL, URL_PRINCIPAL, URL_RESPALDO, DireccionPrincipal, DireccionRespaldo, } from '../Constantes/constants'
 
 
 class LoginScreen extends Component{
@@ -18,9 +18,10 @@ class LoginScreen extends Component{
         }
     }
 
-    componentDidMount()
+    async componentDidMount()
     {
         console.log('entro en login screen')
+        await this.verificarConexionServidor();
     }
 
     setEmail = (email)=>{
@@ -35,9 +36,54 @@ class LoginScreen extends Component{
         })
     }
 
+    verificarConexionServidor = async () => {
+        try {
+            let responsePrincipal = "";
+            let responseRespaldo = "";
+            let SeguirVerificando = false;
+
+            try {
+                let controller1 = new AbortController()
+                setTimeout(() => controller1.abort(), 5000);  // abort after 15 seconds
+
+                let URL1 = URL_PRINCIPAL + '/Hola'
+                responsePrincipal = await fetch(URL1, {signal: controller1.signal});  
+                let r1 = await responsePrincipal.json();
+                console.log(r1)
+                DireccionPrincipal();
+
+                } catch (error) {
+                    console.log('cayo en error al verificar url principal')
+                    SeguirVerificando = true;
+                    console.log(error)
+                }
+
+            if(SeguirVerificando){
+                try {
+                    let controller2 = new AbortController()
+                    setTimeout(() => controller2.abort(), 5000);  // abort after 15 seconds
+
+                    let URL2 = URL_RESPALDO + '/Hola'
+                    responseRespaldo = await fetch(URL2, {signal: controller2.signal});
+                    let r2 = await responseRespaldo.json();
+                    console.log(r2)
+                    DireccionRespaldo();
+                } catch (error) {
+                    console.log('cayo en error al verificar url respaldo')
+                    SeguirVerificando = true;
+                    console.log(error)
+                }
+            }
+          
+        } catch (error) {
+          console.error("Error al intentar conectar al servidor:", error.message);
+        }
+    };
+
     login = async ()=>{ //funcion asyncrona
 
         try {
+
             this.setState({ loading: true });
             
             let url_ = `${API_URL_GRAL}VerificaUsuarioTCN?` 

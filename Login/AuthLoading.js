@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { useNavigation  } from '@react-navigation/native';
 import { View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {API_URL_GRAL} from '../Constantes/constants'
+import {API_URL_GRAL, URL_PRINCIPAL, URL_RESPALDO, DireccionPrincipal, DireccionRespaldo} from '../Constantes/constants'
 import { StackActions } from '@react-navigation/native';
 // import { connect } from 'react-redux';
 // import * as userActions from '../reduxStore/actions/user'
@@ -19,16 +19,59 @@ class AuthLoading extends Component{
         loading:false
     }
   }
-  componentDidMount(){
+  async componentDidMount(){
     console.log('entro en aut loading')
-      this.getUser();
+    
+    await this.getUser();
   }
   componentWillUnmount()
   {
 
   }
 
+  verificarConexionServidor = async () => {
+    try {
+        let responsePrincipal = "";
+        let responseRespaldo = "";
+        let SeguirVerificando = false;
 
+        try {
+            let controller1 = new AbortController()
+            setTimeout(() => controller1.abort(), 5000);  // abort after 15 seconds
+
+            let URL1 = URL_PRINCIPAL + '/Hola'
+            responsePrincipal = await fetch(URL1, {signal: controller1.signal});  
+            let r1 = await responsePrincipal.json();
+            console.log(r1)
+            DireccionPrincipal();
+
+            } catch (error) {
+                console.log('cayo en error al verificar url principal')
+                SeguirVerificando = true;
+                console.log(error)
+            }
+
+        if(SeguirVerificando){
+            try {
+                let controller2 = new AbortController()
+                setTimeout(() => controller2.abort(), 5000);  // abort after 15 seconds
+
+                let URL2 = URL_RESPALDO + '/Hola'
+                responseRespaldo = await fetch(URL2, {signal: controller2.signal});
+                let r2 = await responseRespaldo.json();
+                console.log(r2)
+                DireccionRespaldo();
+            } catch (error) {
+                console.log('cayo en error al verificar url respaldo')
+                SeguirVerificando = true;
+                console.log(error)
+            }
+        }
+      
+    } catch (error) {
+      console.error("Error al intentar conectar al servidor:", error.message);
+    }
+};
 
   getUser = async () =>{
     // const value1 = await AsyncStorage.getItem('@NombreUser')
@@ -40,6 +83,7 @@ class AuthLoading extends Component{
 
       if(value2!=null && value4!=null)
       {
+        await this.verificarConexionServidor();
         //validar que la contraseña no haya cambiado
         try {
             let url_ = `${API_URL_GRAL}VerificaUsuarioTCN?` 
