@@ -13,7 +13,7 @@ import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { API_URL_GRAL as API_URL_TCN } from  '../Constantes/constants';
-
+import NetInfo from '@react-native-community/netinfo';
 //const API_URL_TCN = 'http://187.190.62.113/TCN_WEB/TNC/'
 const API_URL = 'https://spatiatek-access-demo-php.herokuapp.com/api/access/'
 
@@ -29,6 +29,7 @@ class SCanner extends Component {
 
   async componentDidMount()
   {
+      this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange);
       //  let cadena = 
       //  'Inmueble=T03/Tipo=PE/NumAcceso=14'
       //  //'Inmueble=T01/Tipo=PE/NumAcceso=1'
@@ -78,65 +79,88 @@ class SCanner extends Component {
 
 
   }
+  componentWillUnmount() {
+    this.unsubscribe();
+    //console.log('unsubscribe netInfo SCA')
+  }
+
+  _handleConnectivityChange = (state) => {
+    if (state.isConnected) {
+      this.setState({ connection_Status: 'Online' });
+    } else {
+      this.setState({ connection_Status: 'Offline' });
+    }
+  };
 
   onSuccess = e => {
     try {
-      let txtQr = e.data.toUpperCase()
-      if(txtQr.length >0)
-      {
-
-        let cadena = txtQr
-        //'Inmueble=T02/Tipo=VE/NumAcceso=7'
-        let arrayCadenas = cadena.split('/')
-        if(arrayCadenas.length == 3){
-          let indiceInmueble = arrayCadenas[0].indexOf('=')
-          let indiceTipo = arrayCadenas[1].indexOf('=')
-          let indiceAcceso = arrayCadenas[2].indexOf('=')
-
-          if(indiceInmueble>0 && indiceTipo>0 && indiceAcceso>0)
+      if (this.state.connection_Status === 'Online') {
+          let txtQr = e.data.toUpperCase()
+          if(txtQr.length >0)
           {
-            let _Inmueble = arrayCadenas[0].substring(indiceInmueble+1, arrayCadenas[0].length)
-            let _Tipo = arrayCadenas[1].substring(indiceTipo+1, arrayCadenas[1].length)
-            let _NumAccess = arrayCadenas[2].substring(indiceAcceso+1, arrayCadenas[2].length)
 
-            if(_Inmueble.length>0 && _Tipo.length>0 && _NumAccess.length>0)
-            {
-              this.setState({loading: true});
-              this.ValidaAcceso(_Inmueble, _Tipo, _NumAccess);
+            let cadena = txtQr
+            //'Inmueble=T02/Tipo=VE/NumAcceso=7'
+            let arrayCadenas = cadena.split('/')
+            if(arrayCadenas.length == 3){
+              let indiceInmueble = arrayCadenas[0].indexOf('=')
+              let indiceTipo = arrayCadenas[1].indexOf('=')
+              let indiceAcceso = arrayCadenas[2].indexOf('=')
+
+              if(indiceInmueble>0 && indiceTipo>0 && indiceAcceso>0)
+              {
+                let _Inmueble = arrayCadenas[0].substring(indiceInmueble+1, arrayCadenas[0].length)
+                let _Tipo = arrayCadenas[1].substring(indiceTipo+1, arrayCadenas[1].length)
+                let _NumAccess = arrayCadenas[2].substring(indiceAcceso+1, arrayCadenas[2].length)
+
+                if(_Inmueble.length>0 && _Tipo.length>0 && _NumAccess.length>0)
+                {
+                  this.setState({loading: true});
+                  this.ValidaAcceso(_Inmueble, _Tipo, _NumAccess);
+                }
+                else
+                {
+                  Alert.alert(
+                    'Titanium All Access', 'Formato no valido para verificacion de acceso',
+                    [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
+                    {cancelable: false},
+                  );
+                }
+              }
+              else
+              {
+                Alert.alert(
+                  'Titanium All Access', 'Formato no valido para verificacion de acceso',
+                  [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
+                  {cancelable: false},
+                );
+              }
             }
-            else
-            {
+            else{
               Alert.alert(
                 'Titanium All Access', 'Formato no valido para verificacion de acceso',
                 [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
                 {cancelable: false},
               );
             }
+
           }
-          else
-          {
+          else{
+            this.setState({loading: false});
             Alert.alert(
               'Titanium All Access', 'Formato no valido para verificacion de acceso',
               [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
               {cancelable: false},
             );
           }
-        }
-        else{
-          Alert.alert(
-            'Titanium All Access', 'Formato no valido para verificacion de acceso',
-            [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
-            {cancelable: false},
-          );
-        }
-
       }
-      else{
-        this.setState({loading: false});
+      else
+      {
         Alert.alert(
-          'Titanium All Access', 'Formato no valido para verificacion de acceso',
-          [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
-          {cancelable: false},
+          'Titanium All Access',
+          'No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente',
+          [{ text: 'OK', onPress: () => console.log('.'), style: 'cancel' }],
+          { cancelable: false }
         );
       }
     } catch (error) {

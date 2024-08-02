@@ -2,7 +2,7 @@
 //const HOST = '192.168.1.123:50/TNC'
 var HOST_PRINCIPAL = '74.208.124.142:50'
 var HOST_RESPALDO = '187.190.62.113/TCN_WEB'
-var VersionSys = 'v2.1.9 Mazapán'
+var VersionSys = 'v2.1.10 Mazapán'
 
 var API_URL_GRAL = `http://${HOST_PRINCIPAL}/TNC`;
 

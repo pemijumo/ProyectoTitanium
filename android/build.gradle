@@ -8,8 +8,8 @@ buildscript {
         minSdkVersion = 21
         compileSdkVersion = 33
         targetSdkVersion = 33
-        versionCode = 14
-        versionName = '2.1.9'
+        versionCode = 15
+        versionName = '2.1.10'
 
         if (System.properties['os.arch'] == "aarch64") {
             // For M1 Users we need to use the NDK 24 which added support for aarch64

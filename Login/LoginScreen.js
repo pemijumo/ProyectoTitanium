@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 // import { connect } from 'react-redux'
 // import * as userActions from '../reduxStore/actions/user'
 import {API_URL_GRAL, URL_PRINCIPAL, URL_RESPALDO, DireccionPrincipal, DireccionRespaldo, } from '../Constantes/constants'
-
+import NetInfo from "@react-native-community/netinfo";
 
 class LoginScreen extends Component{
     constructor(props){
@@ -14,14 +14,36 @@ class LoginScreen extends Component{
         this.state={
             email:'',
             password: '',
-            loading:false
+            loading:false,
+            connection_Status: "Online",
         }
     }
 
     async componentDidMount()
     {
+      try {
+        this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange);
+
         console.log('entro en login screen')
         await this.verificarConexionServidor();
+        
+      } catch (error) {
+        
+      }
+      
+            
+             
+    }
+
+    componentWillUnmount() {
+      try {
+        this.unsubscribe();
+        console.log('unsubscribe netInfo LS')
+        
+      } catch (error) {
+        
+      }
+      
     }
 
     setEmail = (email)=>{
@@ -42,37 +64,48 @@ class LoginScreen extends Component{
             let responseRespaldo = "";
             let SeguirVerificando = false;
 
-            try {
-                let controller1 = new AbortController()
-                setTimeout(() => controller1.abort(), 5000);  // abort after 15 seconds
-
-                let URL1 = URL_PRINCIPAL + '/Hola'
-                responsePrincipal = await fetch(URL1, {signal: controller1.signal});  
-                let r1 = await responsePrincipal.json();
-                console.log(r1)
-                DireccionPrincipal();
-
-                } catch (error) {
-                    console.log('cayo en error al verificar url principal')
-                    SeguirVerificando = true;
-                    console.log(error)
-                }
-
-            if(SeguirVerificando){
+            if(this.state.connection_Status=="Online")
+            {
+              console.log('en linea aut loading')
                 try {
-                    let controller2 = new AbortController()
-                    setTimeout(() => controller2.abort(), 5000);  // abort after 15 seconds
+                    let controller1 = new AbortController()
+                    setTimeout(() => controller1.abort(), 5000);  // abort after 15 seconds
 
-                    let URL2 = URL_RESPALDO + '/Hola'
-                    responseRespaldo = await fetch(URL2, {signal: controller2.signal});
-                    let r2 = await responseRespaldo.json();
-                    console.log(r2)
-                    DireccionRespaldo();
-                } catch (error) {
-                    console.log('cayo en error al verificar url respaldo')
-                    SeguirVerificando = true;
-                    console.log(error)
+                    let URL1 = URL_PRINCIPAL + '/Hola'
+                    responsePrincipal = await fetch(URL1, {signal: controller1.signal});  
+                    let r1 = await responsePrincipal.json();
+                    console.log(r1)
+                    DireccionPrincipal();
+
+                    } catch (error) {
+                        console.log('cayo en error al verificar url principal')
+                        SeguirVerificando = true;
+                        console.log(error)
+                    }
+
+                if(SeguirVerificando){
+                    try {
+                        let controller2 = new AbortController()
+                        setTimeout(() => controller2.abort(), 5000);  // abort after 15 seconds
+
+                        let URL2 = URL_RESPALDO + '/Hola'
+                        responseRespaldo = await fetch(URL2, {signal: controller2.signal});
+                        let r2 = await responseRespaldo.json();
+                        console.log(r2)
+                        DireccionRespaldo();
+                    } catch (error) {
+                        console.log('cayo en error al verificar url respaldo')
+                        SeguirVerificando = true;
+                        console.log(error)
+                    }
                 }
+            }
+            else{
+                Alert.alert(
+                    'Titanium All Access', "No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente",
+                    [{ text: 'OK', onPress: () => console.log('.'), style: 'cancel',}],
+                    {cancelable: false},
+                  );
             }
           
         } catch (error) {
@@ -187,6 +220,20 @@ class LoginScreen extends Component{
         }
 
     }
+
+    _handleConnectivityChange = (state) => {
+      try {
+        if (state.isConnected) {
+          this.setState({ connection_Status: 'Online' }, this.verificarConexionServidor);
+        } else {
+          this.setState({ connection_Status: 'Offline' });
+        }
+        
+      } catch (error) {
+        
+      }
+      
+    };
 
     render(){
         return(
