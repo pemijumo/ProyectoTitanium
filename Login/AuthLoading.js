@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, View, Text, BackHandler, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL_GRAL, URL_PRINCIPAL, URL_RESPALDO, DireccionPrincipal, DireccionRespaldo } from '../Constantes/constants';
 import { StackActions } from '@react-navigation/native';
@@ -11,31 +11,56 @@ class AuthLoading extends Component {
     this.state = {
       loading: false,
       connection_Status: 'Online',
+      msjConexion: false
     };
   }
 
-  async componentDidMount() {
-    try {
-      this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange);
+  // async componentDidMount() {
+  //   try {
+  //     this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange);
 
-      console.log('entro en aut loading');
-      await this.getUser();
+  //     console.log('entro en aut loading');
+  //     await this.getUser();
       
-    } catch (error) {
+  //   } catch (error) {
       
-    }
+  //   }
     
+  // }
+
+  // componentWillUnmount() {
+  //   try {
+  //     this.unsubscribe();
+  //     console.log('unsubscribe netInfo AL')
+      
+  //   } catch (error) {
+      
+  //   }
+    
+  // }
+
+  // _handleConnectivityChange = (state) => {
+  //   try {
+  //     if (state.isConnected && (state.isInternetReachable == null ? true : state.isInternetReachable)){
+  //       this.setState({ connection_Status: 'Online' }, this.getUser);
+  //     } else {
+  //       this.setState({ connection_Status: 'Offline' });
+  //     }
+      
+  //   } catch (error) {
+      
+  //   }
+    
+  // };
+
+  async componentDidMount()
+  {
+    this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange)
+    await this.getUser();      
   }
 
   componentWillUnmount() {
-    try {
       this.unsubscribe();
-      console.log('unsubscribe netInfo AL')
-      
-    } catch (error) {
-      
-    }
-    
   }
 
   _handleConnectivityChange = (state) => {
@@ -45,7 +70,6 @@ class AuthLoading extends Component {
       } else {
         this.setState({ connection_Status: 'Offline' });
       }
-      
     } catch (error) {
       
     }
@@ -58,46 +82,95 @@ class AuthLoading extends Component {
       let responseRespaldo = '';
       let SeguirVerificando = false;
 
-      if (this.state.connection_Status === 'Online') {
+      if (this.state.connection_Status=='Online') {
+
+        let ConexionInternet = true;
         try {
-          let controller1 = new AbortController();
-          setTimeout(() => controller1.abort(), 5000); // abort after 15 seconds
-
-          let URL1 = URL_PRINCIPAL + '/Hola';
-          responsePrincipal = await fetch(URL1, { signal: controller1.signal });
-          let r1 = await responsePrincipal.json();
-          console.log(r1);
-          DireccionPrincipal();
-        } catch (error) {
-          console.log('cayo en error al verificar url principal');
-          SeguirVerificando = true;
-          console.log(error);
-        }
-
-        if (SeguirVerificando) {
-          try {
-            let controller2 = new AbortController();
-            setTimeout(() => controller2.abort(), 5000); // abort after 15 seconds
-
-            let URL2 = URL_RESPALDO + '/Hola';
-            responseRespaldo = await fetch(URL2, { signal: controller2.signal });
-            let r2 = await responseRespaldo.json();
-            console.log(r2);
-            DireccionRespaldo();
-          } catch (error) {
-            console.log('cayo en error al verificar url respaldo');
-            console.log(error);
+          let controller0 = new AbortController()
+          setTimeout(() => controller0.abort(), 2000);  // abort after 15 seconds
+          const responseInternet = await fetch('https://www.google.com', {signal: controller0.signal}); 
+          console.log('respuesta response pin google')
+          console.log(responseInternet)
+          if(responseInternet.ok){
+            ConexionInternet = true;
           }
+          else{
+            ConexionInternet = false;
+          }
+        } catch (error) {
+          ConexionInternet = false;
         }
+
+        // console.log('se va a validar si esta conectado en authloading')
+        // let conexion = internetConnected;
+        // console.log('internetConnected autloa')
+        // console.log(conexion)
+        if(ConexionInternet){
+            try {
+              let controller1 = new AbortController();
+              setTimeout(() => controller1.abort(), 5000); // abort after 15 seconds
+
+              let URL1 = URL_PRINCIPAL + '/Hola';
+              responsePrincipal = await fetch(URL1, { signal: controller1.signal });
+              let r1 = await responsePrincipal.json();
+              console.log(r1);
+              DireccionPrincipal();
+            } catch (error) {
+              console.log('cayo en error al verificar url principal');
+              SeguirVerificando = true;
+              console.log(error);
+            }
+
+            if (SeguirVerificando) {
+              try {
+                let controller2 = new AbortController();
+                setTimeout(() => controller2.abort(), 5000); // abort after 15 seconds
+
+                let URL2 = URL_RESPALDO + '/Hola';
+                responseRespaldo = await fetch(URL2, { signal: controller2.signal });
+                let r2 = await responseRespaldo.json();
+                console.log(r2);
+                DireccionRespaldo();
+              } catch (error) {
+                console.log('cayo en error al verificar url respaldo');
+                console.log(error);
+              }
+            }
+        }
+        else{
+          if(!this.state.msjConexion){
+            Alert.alert(
+              'Titanium All Access', "No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente",
+              [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
+              {cancelable: false},
+            );
+            this.setState({msjConexion:true})
+
+            if(Platform.OS != 'ios'){
+              BackHandler.exitApp();
+            }
+          }
+
+        }
+
+
       } else {
-        Alert.alert(
-          'Titanium All Access',
-          'No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente',
-          [{ text: 'OK', onPress: () => console.log('.'), style: 'cancel' }],
-          { cancelable: false }
-        );
+        if(!this.state.msjConexion){
+          Alert.alert(
+            'Titanium All Access', "No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente",
+            [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
+            {cancelable: false},
+          );
+          this.setState({msjConexion:true})
+        }
       }
     } catch (error) {
+      // Alert.alert(
+      //   'Titanium All Access', error.message,
+      //   [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
+      //   {cancelable: false},
+      // );
+      // this.setState({msjConexion:true})
       console.error('Error al intentar conectar al servidor:', error.message);
     }
   };

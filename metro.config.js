@@ -5,6 +5,8 @@
  * @format
  */
 
+const blackList = /.*git.*|.*android.*|.*__fixtures__.*|.*node_modules.*|.*react.*|.*dist.*|.*website\\node_modules.*|.heapCapture\\bundle.js|.*__tests__.*/gm
+
 module.exports = {
   transformer: {
     getTransformOptions: async () => ({

@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import { Alert } from 'react-native';
+import { Alert, View, Text } from 'react-native';
 import AuthenticatorUI from './AuthenticatorUI'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 // import auth from '@react-native-firebase/auth';
@@ -15,36 +15,34 @@ class LoginScreen extends Component{
             email:'',
             password: '',
             loading:false,
-            connection_Status: "Online",
+            connection_Status: 'Online',
+            msjConexion: false
         }
     }
 
     async componentDidMount()
     {
-      try {
-        this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange);
-
-        console.log('entro en login screen')
-        await this.verificarConexionServidor();
-        
-      } catch (error) {
-        
-      }
-      
-            
-             
+        this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange)
+        await this.verificarConexionServidor();       
     }
 
     componentWillUnmount() {
+      this.unsubscribe();
+    }
+
+    _handleConnectivityChange = (state) => {
       try {
-        this.unsubscribe();
-        console.log('unsubscribe netInfo LS')
+        if (state.isConnected) {
+          this.setState({ connection_Status: 'Online' }, this.verificarConexionServidor);
+        } else {
+          this.setState({ connection_Status: 'Offline' });
+        }
         
       } catch (error) {
         
       }
       
-    }
+    };
 
     setEmail = (email)=>{
         this.setState({
@@ -58,68 +56,115 @@ class LoginScreen extends Component{
         })
     }
 
-    verificarConexionServidor = async () => {
+    verificarConexionServidor = async (state) => {
         try {
-            let responsePrincipal = "";
-            let responseRespaldo = "";
-            let SeguirVerificando = false;
+            let responsePrincipal = ""
+            let responseRespaldo = ""
+            let SeguirVerificando = false
 
-            if(this.state.connection_Status=="Online")
-            {
-              console.log('en linea aut loading')
+
+            console.log(this.state.connection_Status)
+            if (this.state.connection_Status=='Online') {
+                let ConexionInternet = true;
                 try {
-                    let controller1 = new AbortController()
-                    setTimeout(() => controller1.abort(), 5000);  // abort after 15 seconds
+                  let controller0 = new AbortController()
+                  setTimeout(() => controller0.abort(), 2000);  // abort after 15 seconds
+                  const responseInternet = await fetch('https://www.google.com', {signal: controller0.signal});  
 
-                    let URL1 = URL_PRINCIPAL + '/Hola'
-                    responsePrincipal = await fetch(URL1, {signal: controller1.signal});  
-                    let r1 = await responsePrincipal.json();
-                    console.log(r1)
-                    DireccionPrincipal();
-
-                    } catch (error) {
-                        console.log('cayo en error al verificar url principal')
-                        SeguirVerificando = true;
-                        console.log(error)
-                    }
-
-                if(SeguirVerificando){
+                  console.log('respuesta response pin google')
+                  console.log(responseInternet)
+                  if(responseInternet.ok){
+                    ConexionInternet = true;
+                  }
+                  else{
+                    ConexionInternet = false;
+                  }
+                } catch (error) {
+                  ConexionInternet = false;
+                }
+                
+                if(ConexionInternet){
                     try {
-                        let controller2 = new AbortController()
-                        setTimeout(() => controller2.abort(), 5000);  // abort after 15 seconds
-
-                        let URL2 = URL_RESPALDO + '/Hola'
-                        responseRespaldo = await fetch(URL2, {signal: controller2.signal});
-                        let r2 = await responseRespaldo.json();
-                        console.log(r2)
-                        DireccionRespaldo();
-                    } catch (error) {
-                        console.log('cayo en error al verificar url respaldo')
-                        SeguirVerificando = true;
-                        console.log(error)
+                        let controller1 = new AbortController()
+                        setTimeout(() => controller1.abort(), 5000);  // abort after 15 seconds
+    
+                        let URL1 = URL_PRINCIPAL + '/Hola'
+                        responsePrincipal = await fetch(URL1, {signal: controller1.signal});  
+                        let r1 = await responsePrincipal.json();
+                        console.log(r1)
+                        DireccionPrincipal();
+    
+                        } catch (error) {
+                            console.log('cayo en error al verificar url principal')
+                            SeguirVerificando = true;
+                            console.log(error)
+                        }
+    
+                    if(SeguirVerificando){
+                        try {
+                            let controller2 = new AbortController()
+                            setTimeout(() => controller2.abort(), 5000);  // abort after 15 seconds
+    
+                            let URL2 = URL_RESPALDO + '/Hola'
+                            responseRespaldo = await fetch(URL2, {signal: controller2.signal});
+                            let r2 = await responseRespaldo.json();
+                            console.log(r2)
+                            DireccionRespaldo();
+                        } catch (error) {
+                            console.log('cayo en error al verificar url respaldo')
+                            SeguirVerificando = true;
+                            console.log(error)
+                        }
                     }
                 }
+                else{
+                  if(!this.state.msjConexion){
+                    Alert.alert(
+                      'Titanium All Access', "No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente",
+                      [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
+                      {cancelable: false},
+                    );
+                    this.setState({msjConexion:true})
+                  }
+
+                }
+
+                
             }
             else{
+              if(!this.state.msjConexion){
                 Alert.alert(
                     'Titanium All Access', "No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente",
-                    [{ text: 'OK', onPress: () => console.log('.'), style: 'cancel',}],
+                    [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
                     {cancelable: false},
                   );
+                  this.setState({msjConexion:true})
+                }
             }
           
-        } catch (error) {
+        } 
+        catch (error) {
+          // Alert.alert(
+          //   'Titanium All Access', error.message,
+          //   [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
+          //   {cancelable: false},
+          // );
+          // this.setState({msjConexion:true})
           console.error("Error al intentar conectar al servidor:", error.message);
         }
-    };
+    }
+
+    // Función para mostrar la alerta de conexión
+    
 
     login = async ()=>{ //funcion asyncrona
 
         try {
-
             this.setState({ loading: true });
+
+            console.log('url:' + API_URL_GRAL)
             
-            let url_ = `${API_URL_GRAL}VerificaUsuarioTCN?` 
+            let url_ = `${API_URL_GRAL}/VerificaUsuarioTCN?` 
             + `Usuario=` + this.state.email 
             + `&Contrasenia=` + this.state.password
 
@@ -220,20 +265,6 @@ class LoginScreen extends Component{
         }
 
     }
-
-    _handleConnectivityChange = (state) => {
-      try {
-        if (state.isConnected) {
-          this.setState({ connection_Status: 'Online' }, this.verificarConexionServidor);
-        } else {
-          this.setState({ connection_Status: 'Offline' });
-        }
-        
-      } catch (error) {
-        
-      }
-      
-    };
 
     render(){
         return(

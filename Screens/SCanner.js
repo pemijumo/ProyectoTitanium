@@ -23,13 +23,40 @@ class SCanner extends Component {
     super(props);
     this.state = {
       loading: false,
-      ModoValidacion: 'residente'
+      ModoValidacion: 'residente',
+      connection_Status: 'Online',
+      msjConexion: false
     }
   }
 
-  async componentDidMount()
-  {
-      this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange);
+  async componentDidMount() {
+    this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange);
+  }
+
+  componentWillUnmount() {
+      if (this.unsubscribe) {
+          this.unsubscribe(); // Llama a la función para limpiar el listener
+      }
+  }
+
+  _handleConnectivityChange = (state) => {
+    try {
+      if (state.isConnected) {
+        this.setState({ connection_Status: 'Online' });
+      } else {
+        this.setState({ connection_Status: 'Offline' });
+      }
+    } catch (error) {
+      
+    }
+    
+  };
+
+  //async componentDidMount()
+  //{
+      //this.unsubscribe = NetInfo.addEventListener(this._handleConnectivityChange);
+
+
       //  let cadena = 
       //  'Inmueble=T03/Tipo=PE/NumAcceso=14'
       //  //'Inmueble=T01/Tipo=PE/NumAcceso=1'
@@ -78,92 +105,130 @@ class SCanner extends Component {
 
 
 
-  }
-  componentWillUnmount() {
-    this.unsubscribe();
-    //console.log('unsubscribe netInfo SCA')
-  }
+  //}
+  // componentWillUnmount() {
+  //   //this.unsubscribe();
+  //   //console.log('unsubscribe netInfo SCA')
+  // }
 
-  _handleConnectivityChange = (state) => {
-    if (state.isConnected) {
-      this.setState({ connection_Status: 'Online' });
-    } else {
-      this.setState({ connection_Status: 'Offline' });
-    }
-  };
+  // _handleConnectivityChange = (state) => {
+  //   if (state.isConnected) {
+  //     this.setState({ connection_Status: 'Online' });
+  //   } else {
+  //     this.setState({ connection_Status: 'Offline' });
+  //   }
+  // };
 
-  onSuccess = e => {
+  onSuccess = async (e) => {
     try {
       if (this.state.connection_Status === 'Online') {
-          let txtQr = e.data.toUpperCase()
-          if(txtQr.length >0)
-          {
+          let ConexionInternet = true;
+          try {
+            let controller0 = new AbortController()
+            setTimeout(() => controller0.abort(), 2000);  // abort after 15 seconds
+            const responseInternet = await fetch('https://www.google.com', {signal: controller0.signal}); 
+            console.log('respuesta response pin google')
+            console.log(responseInternet)
+            if(responseInternet.ok){
+              ConexionInternet = true;
+            }
+            else{
+              ConexionInternet = false;
+            }
+          } catch (error) {
+            ConexionInternet = false;
+          }
 
-            let cadena = txtQr
-            //'Inmueble=T02/Tipo=VE/NumAcceso=7'
-            let arrayCadenas = cadena.split('/')
-            if(arrayCadenas.length == 3){
-              let indiceInmueble = arrayCadenas[0].indexOf('=')
-              let indiceTipo = arrayCadenas[1].indexOf('=')
-              let indiceAcceso = arrayCadenas[2].indexOf('=')
-
-              if(indiceInmueble>0 && indiceTipo>0 && indiceAcceso>0)
+          if(ConexionInternet){
+              let txtQr = e.data.toUpperCase()
+              if(txtQr.length >0)
               {
-                let _Inmueble = arrayCadenas[0].substring(indiceInmueble+1, arrayCadenas[0].length)
-                let _Tipo = arrayCadenas[1].substring(indiceTipo+1, arrayCadenas[1].length)
-                let _NumAccess = arrayCadenas[2].substring(indiceAcceso+1, arrayCadenas[2].length)
 
-                if(_Inmueble.length>0 && _Tipo.length>0 && _NumAccess.length>0)
-                {
-                  this.setState({loading: true});
-                  this.ValidaAcceso(_Inmueble, _Tipo, _NumAccess);
+                let cadena = txtQr
+                //'Inmueble=T02/Tipo=VE/NumAcceso=7'
+                let arrayCadenas = cadena.split('/')
+                if(arrayCadenas.length == 3){
+                  let indiceInmueble = arrayCadenas[0].indexOf('=')
+                  let indiceTipo = arrayCadenas[1].indexOf('=')
+                  let indiceAcceso = arrayCadenas[2].indexOf('=')
+
+                  if(indiceInmueble>0 && indiceTipo>0 && indiceAcceso>0)
+                  {
+                    let _Inmueble = arrayCadenas[0].substring(indiceInmueble+1, arrayCadenas[0].length)
+                    let _Tipo = arrayCadenas[1].substring(indiceTipo+1, arrayCadenas[1].length)
+                    let _NumAccess = arrayCadenas[2].substring(indiceAcceso+1, arrayCadenas[2].length)
+
+                    if(_Inmueble.length>0 && _Tipo.length>0 && _NumAccess.length>0)
+                    {
+                      this.setState({loading: true});
+                      this.ValidaAcceso(_Inmueble, _Tipo, _NumAccess);
+                    }
+                    else
+                    {
+                      Alert.alert(
+                        'Titanium All Access', 'Formato no valido para verificacion de acceso',
+                        [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
+                        {cancelable: false},
+                      );
+                    }
+                  }
+                  else
+                  {
+                    Alert.alert(
+                      'Titanium All Access', 'Formato no valido para verificacion de acceso',
+                      [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
+                      {cancelable: false},
+                    );
+                  }
                 }
-                else
-                {
+                else{
                   Alert.alert(
                     'Titanium All Access', 'Formato no valido para verificacion de acceso',
                     [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
                     {cancelable: false},
                   );
                 }
+
               }
-              else
-              {
+              else{
+                this.setState({loading: false});
                 Alert.alert(
                   'Titanium All Access', 'Formato no valido para verificacion de acceso',
                   [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
                   {cancelable: false},
                 );
               }
-            }
-            else{
+          }
+          else
+          {
+            if(!this.state.msjConexion){
               Alert.alert(
-                'Titanium All Access', 'Formato no valido para verificacion de acceso',
-                [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
+                'Titanium All Access', "No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente",
+                [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
                 {cancelable: false},
               );
+              this.setState({msjConexion:true})
             }
-
-          }
-          else{
-            this.setState({loading: false});
-            Alert.alert(
-              'Titanium All Access', 'Formato no valido para verificacion de acceso',
-              [{ text: 'OK', onPress: () => console.log('Presionó OK'), style: 'cancel',}],
-              {cancelable: false},
-            );
           }
       }
       else
       {
-        Alert.alert(
-          'Titanium All Access',
-          'No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente',
-          [{ text: 'OK', onPress: () => console.log('.'), style: 'cancel' }],
-          { cancelable: false }
-        );
+        if(!this.state.msjConexion){
+          Alert.alert(
+            'Titanium All Access', "No se ha detectado una conexión a internet, verifique su conexión e intente nuevamente",
+            [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
+            {cancelable: false},
+          );
+          this.setState({msjConexion:true})
+        }
       }
     } catch (error) {
+      // Alert.alert(
+      //   'Titanium All Access', error.message,
+      //   [{ text: 'OK', onPress: () => this.setState({msjConexion:false}), style: 'cancel',}],
+      //   {cancelable: false},
+      // );
+      // this.setState({msjConexion:true})
       console.log(error)
     }
     
